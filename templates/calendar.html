@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}تقویم - پلنر{% endblock %}
+{% block content %}
+<div class="cal-toolbar">
+  {% if mode == 'month' %}
+  <a class="btn btn-ghost btn-sm" href="?jy={{ next_jy }}&jm={{ next_jm }}&mode=month">›</a>
+  <div class="cal-title">{{ month_title }}</div>
+  <a class="btn btn-ghost btn-sm" href="?jy={{ prev_jy }}&jm={{ prev_jm }}&mode=month">‹</a>
+  {% else %}
+  <a class="btn btn-ghost btn-sm" href="?jy={{ jy }}&jm={{ jm }}&mode={{ mode }}&selected={{ selected_iso }}">›</a>
+  <div class="cal-title">{{ sel_label }}</div>
+  <a class="btn btn-ghost btn-sm" href="?jy={{ jy }}&jm={{ jm }}&mode={{ mode }}&selected={{ selected_iso }}">‹</a>
+  {% endif %}
+  <div class="seg">
+    <a href="?jy={{ jy }}&jm={{ jm }}&mode=month" class="{% if mode == 'month' %}sel{% endif %}">ماه</a>
+    <a href="?jy={{ jy }}&jm={{ jm }}&mode=week&selected={{ selected_iso }}" class="{% if mode == 'week' %}sel{% endif %}">هفته</a>
+    <a href="?jy={{ jy }}&jm={{ jm }}&mode=day&selected={{ selected_iso }}" class="{% if mode == 'day' %}sel{% endif %}">روز</a>
+  </div>
+  <a class="btn btn-ghost btn-sm" href="?jy={{ today_jy }}&jm={{ today_jm }}&mode=month">امروز</a>
+  <button class="btn btn-primary btn-sm" data-new-event="{{ selected_iso }}">+ رویداد</button>
+</div>
+
+<script id="pageData" type="application/json">{{ page_data|safe }}</script>
+
+{% if mode == 'month' %}
+<div class="cal-weekdays">{% for w in weekdays %}<div>{{ w }}</div>{% endfor %}</div>
+<div class="cal-grid">
+  {% for c in cells %}
+  <a href="?jy={{ jy }}&jm={{ jm }}&mode=day&selected={{ c.iso }}" class="cal-cell {% if c.other %}other{% endif %} {% if c.is_today %}today{% endif %} {% if c.is_selected %}selected{% endif %}">
+    <div class="cal-num">{{ c.jd }}</div>
+    {% for e in c.events|slice:":2" %}<div class="cal-ev ev-event">{{ e.title }}</div>{% endfor %}
+    {% for t in c.tasks %}{% if not t.completed %}{% if forloop.counter <= 2 %}<div class="cal-ev ev-open">☐ {{ t.title }}</div>{% endif %}{% endif %}{% endfor %}
+    {% for t in c.tasks %}{% if t.completed %}{% if forloop.counter <= 2 %}<div class="cal-ev ev-done">✓ {{ t.title }}</div>{% endif %}{% endif %}{% endfor %}
+    {% if c.tasks %}<div class="cal-count">{{ c.done }} انجام‌شده ✓ · {{ c.open }} باز</div>{% endif %}
+    {% if c.habits %}<div class="cal-habit">🔥 {{ c.habits }} عادت</div>{% endif %}
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="week-strip">
+  {% for w in week_cells %}
+  <a href="?jy={{ jy }}&jm={{ jm }}&mode=day&selected={{ w.iso }}" class="week-day {% if w.is_selected %}sel{% endif %}">
+    {{ w.wname }}
+    <div class="week-num">{{ w.jd }}</div>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if mode == 'day' %}
+<div class="card day-detail">
+  <div class="day-detail-head">
+    <h3>{% if is_today_sel %}📌 امروز — {% endif %}{{ sel_label }}</h3>
+    <div class="row">
+      <button class="btn btn-ghost btn-sm" data-new-event="{{ selected_iso }}">+ رویداد</button>
+      <button class="btn btn-ghost btn-sm" data-new-task="{{ selected_iso }}">+ کار</button>
+      <button class="btn btn-ghost btn-sm" data-new-goal>+ هدف</button>
+    </div>
+  </div>
+  {% if day_habits_done %}<p class="cal-habit">🔥 عادت‌های انجام‌شده: {{ day_habits_done }} از {{ day_habits|length }}</p>{% endif %}
+  {% for e in day_events %}
+  <div class="task-item"><span class="dot"></span><span class="task-title">{{ e.title }}</span>{% if e.time %}<small class="muted">{{ e.time }}</small>{% endif %}<button class="btn btn-ghost btn-sm" data-edel="{{ e.id }}">حذف</button></div>
+  {% endfor %}
+  {% for t in day_tasks %}
+  <div class="task-item {% if t.completed %}done{% endif %}">
+    <button class="checkbox" data-toggle="{{ t.id }}">{% if t.completed %}✓{% else %}○{% endif %}</button>
+    <span class="task-title">{{ t.title }}</span>
+    <button class="btn btn-ghost btn-sm" data-del="{{ t.id }}">حذف</button>
+  </div>
+  {% endfor %}
+  {% if not day_events and not day_tasks %}<p class="empty">این روز خالیه 🍃</p>{% endif %}
+</div>
+{% endif %}
+
+{% endblock %}
+{% block extra_js %}
+<script>try{window.PAGE_DATA=JSON.parse(document.getElementById('pageData').textContent);}catch(e){window.PAGE_DATA={};}</script>
+{% endblock %}

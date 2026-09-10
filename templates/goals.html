@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block title %}اهداف - پلنر{% endblock %}
+{% block content %}
+<button class="btn btn-primary" data-new-goal style="margin-bottom:16px">+ هدف جدید</button>
+
+{% if goals %}
+<div class="card-grid">
+{% for g in goals %}
+<div class="card goal-card">
+  <div class="card-head">
+    <h3>🎯 {{ g.title }}</h3>
+    <button class="icon-btn" data-edit-goal="{{ g.id }}" title="ویرایش">✏️</button>
+  </div>
+  {% if g.description %}<p class="muted goal-desc">{{ g.description }}</p>{% endif %}
+  <div class="progress"><div class="progress-fill" style="width:{{ g.progress }}%"></div></div>
+  <div class="goal-meta">
+    <span class="goal-pct">{{ g.progress }}٪</span>
+    {% if g.deadline_label %}<span class="goal-deadline {% if g.is_late %}late{% endif %}">{% if g.is_late %}⚠ موعد گذشته: {% else %}📅 {% endif %}{{ g.deadline_label }}</span>{% endif %}
+  </div>
+  <div class="goal-tasks">
+    <div class="goal-tasks-head">
+      <span class="muted">کارهای مرتبط ({{ g.completed_tasks }}/{{ g.task_count }})</span>
+      <button class="link" data-new-task data-goal="{{ g.id }}">+ کار</button>
+    </div>
+    {% for t in g.tasks %}
+    <div class="task-item lb mini {% if t.completed %}done{% endif %}">
+      <button class="task-check" data-toggle="{{ t.id }}">✓</button>
+      <div class="task-title">{{ t.title }}</div>
+      <div class="task-actions"><button class="icon-btn" data-edit-task="{{ t.id }}">✏️</button></div>
+    </div>
+    {% empty %}
+    <p class="empty">کار مرتبطی نداره — با «+ کار» یکی اضافه کن.</p>
+    {% endfor %}
+  </div>
+  {% if g.sub_goals %}
+  <ul class="muted sub-goals">{% for sg in g.sub_goals %}<li>{{ sg.title }} — {{ sg.progress }}٪</li>{% endfor %}</ul>
+  {% endif %}
+</div>
+{% endfor %}
+</div>
+{% else %}
+<div class="empty-state"><div class="empty-icon">🏔️</div><h3>هدفی تعریف نکردی</h3><p>یک هدف بزرگ بساز و کارهایش را بهش وصل کن.</p></div>
+{% endif %}
+
+<script id="pageData" type="application/json">{{ page_data|safe }}</script>
+{% endblock %}
+{% block extra_js %}
+<script>try{window.PAGE_DATA=JSON.parse(document.getElementById('pageData').textContent);}catch(e){window.PAGE_DATA={};}</script>
+{% endblock %}

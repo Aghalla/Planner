@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}آمار - پلنر{% endblock %}
+{% block content %}
+<div class="page-head"><h2>آمار</h2>
+<div class="seg">
+<a href="?period=daily" class="{% if period == 'daily' %}sel{% endif %}">روزانه</a>
+<a href="?period=weekly" class="{% if period == 'weekly' %}sel{% endif %}">هفتگی</a>
+<a href="?period=monthly" class="{% if period == 'monthly' %}sel{% endif %}">ماهانه</a>
+</div></div>
+<div class="stat-grid">
+<div class="stat-card"><h3>کارها</h3><p class="big-number">{{ completed_tasks }}/{{ total_tasks }}</p><small class="muted">امتیاز بهره‌وری: {{ productivity_score }}٪</small></div>
+<div class="stat-card"><h3>عادت‌ها</h3><p class="big-number">{{ habit_logs_count }}</p><small class="muted">{{ total_habits }} عادت فعال</small></div>
+<div class="stat-card"><h3>پومودورو</h3><p class="big-number accent">{{ total_focus }} دقیقه</p><small class="muted">{{ pomodoro_count }} جلسه</small></div>
+<div class="stat-card"><h3>اهداف</h3><p class="big-number">{{ completed_goals }}/{{ total_goals }}</p><small class="muted">بهترین روز: {{ best_day|default:"—" }} ({{ best_count }})</small></div>
+</div>
+<div class="widget"><h3>دقایق تمرکز پومودورو در روز</h3><canvas id="chartFocusLine"></canvas></div>
+<div class="widget"><h3>تمرکز به‌تفکیک کار</h3>
+{% for tf in task_focus_list %}
+<div class="focus-row"><span class="focus-name">{{ tf.name }}</span><span class="focus-min">{{ tf.minutes }} دقیقه</span></div>
+{% empty %}<p class="empty">هنوز جلسه تمرکزی ثبت نشده</p>{% endfor %}
+</div>
+<script id="statData" type="application/json">{"days":{{ days|safe }},"focus":{{ task_focus|safe }}}</script>
+{% endblock %}

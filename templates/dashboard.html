@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% block title %}داشبورد - Planner{% endblock %}
+{% block content %}
+<div class="dashboard-header">
+  {% for w in widgets %}
+    {% if w.widget_type == 'greeting' and w.is_visible %}
+    <div class="widget widget-greeting" data-widget="greeting">
+      <h1 class="greeting-text">{{ greeting }}، {{ user_name }}</h1>
+      <p class="date-text" id="jalaliDate">{{ today|date:"Y-m-d" }}</p>
+    </div>
+    {% endif %}
+  {% endfor %}
+  <div class="dashboard-actions">
+    <button class="btn btn-ghost" id="customizeBtn">شخصی‌سازی</button>
+    <button class="btn btn-ghost hidden" id="resetLayoutBtn">بازنشانی</button>
+  </div>
+</div>
+
+<div id="carryOverModal" class="modal hidden">
+  <div class="modal-card">
+    <h3>کار انجام‌نشده</h3>
+    <p id="carryOverText">این کار انجام نشده است. می‌خواهی برای فردا منتقل شود؟</p>
+    <div class="modal-actions">
+      <button class="btn btn-primary" id="carryTomorrow">انتقال به فردا</button>
+      <button class="btn btn-danger" id="carryDelete">حذف</button>
+      <button class="btn btn-ghost" id="carryLater">فعلاً نه</button>
+    </div>
+  </div>
+</div>
+
+<div class="widget-grid" id="widgetGrid">
+  {% for w in widgets %}
+    {% if w.widget_type == 'daily_content' and w.is_visible %}
+    <section class="widget" data-widget="daily_content" draggable="false">
+      <div class="widget-head"><h3>محتوای روزانه</h3></div>
+      <div class="tabs" id="dailyTabs">
+        <button class="tab active" data-tab="tip">☀️ نکته روز</button>
+        <button class="tab" data-tab="fact">💡 دانستنی</button>
+        <button class="tab" data-tab="quote">🧠 سخن بزرگان</button>
+        <button class="tab" data-tab="challenge">🎯 چالش</button>
+      </div>
+      <div class="tab-body">
+        <p id="dailyTip">{{ daily_content.tip|default:"—" }}</p>
+        <p id="dailyFact" class="hidden">{{ daily_content.fact|default:"—" }}</p>
+        <div id="dailyQuote" class="hidden"><p>{{ daily_content.quote|default:"—" }}</p><small>{{ daily_content.quote_author|default:"" }}</small></div>
+        <p id="dailyChallenge" class="hidden">{{ daily_content.challenge|default:"—" }}</p>
+      </div>
+    </section>
+    {% endif %}
+    {% if w.widget_type == 'tasks' and w.is_visible %}
+    <section class="widget" data-widget="tasks">
+      <div class="widget-head"><h3>تمرکز امروز</h3><a href="{% url 'tasks' %}" class="link">همه</a></div>
+      <ul class="task-list" id="mainTaskList">
+        {% for t in main_tasks %}
+        <li class="task-item {% if t.completed %}done{% endif %}" data-id="{{ t.id }}">
+          <button class="checkbox" data-toggle="{{ t.id }}">{% if t.completed %}✓{% else %}☐{% endif %}</button>
+          <span class="task-title">{{ t.title }}</span>
+          <span class="priority p{{ t.priority }}"></span>
+        </li>
+        {% empty %}<li class="empty">کاری برای امروز انتخاب نشده</li>{% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+    {% if w.widget_type == 'habits' and w.is_visible %}
+    <section class="widget" data-widget="habits">
+      <div class="widget-head"><h3>عادت‌ها</h3><a href="{% url 'habits' %}" class="link">همه</a></div>
+      <ul class="habit-list">
+        {% for h in habits %}
+        <li class="habit-item"><span>{{ h.icon }} {{ h.name }}</span></li>
+        {% empty %}<li class="empty">عادتی ثبت نشده</li>{% endfor %}
+      </ul>
+    </section>
+    {% endif %}
+    {% if w.widget_type == 'goals' and w.is_visible %}
+    <section class="widget" data-widget="goals">
+      <div class="widget-head"><h3>اهداف فعال</h3><a href="{% url 'goals' %}" class="link">همه</a></div>
+      {% for g in goals %}
+      <div class="goal-mini"><span>{{ g.title }}</span><div class="progress"><div class="progress-fill" style="width:{{ g.get_progress }}%"></div></div><small>{{ g.get_progress }}٪</small></div>
+      {% empty %}<p class="empty">هدفی ثبت نشده</p>{% endfor %}
+    </section>
+    {% endif %}
+    {% if w.widget_type == 'pomodoro' and w.is_visible %}
+    <section class="widget" data-widget="pomodoro">
+      <div class="widget-head"><h3>تمرکز امروز</h3><a href="{% url 'pomodoro' %}" class="link">پومودورو</a></div>
+      <p class="big-number">{{ total_focus_minutes }} دقیقه</p>
+      <small>{{ pomodoro_count }} پومودورو</small>
+    </section>
+    {% endif %}
+    {% if w.widget_type == 'calendar_mini' and w.is_visible %}
+    <section class="widget" data-widget="calendar_mini">
+      <div class="widget-head"><h3>امروز</h3><a href="{% url 'calendar' %}" class="link">تقویم</a></div>
+      <p>{{ today_tasks.count }} کار امروز</p>
+    </section>
+    {% endif %}
+    {% if w.widget_type == 'stats_mini' and w.is_visible %}
+    <section class="widget" data-widget="stats_mini">
+      <div class="widget-head"><h3>نمای آمار</h3><a href="{% url 'statistics' %}" class="link">آمار</a></div>
+      <p>{{ pomodoro_count }} پومودورو · {{ total_focus_minutes }} دقیقه تمرکز</p>
+    </section>
+    {% endif %}
+  {% endfor %}
+</div>
+
+<div class="widget-settings hidden" id="widgetSettings">
+  <h3>ویجت‌های داشبورد</h3>
+  {% for w in widgets %}
+  <label class="switch-row"><span>{{ w.get_widget_type_display }}</span>
+    <button class="btn btn-ghost btn-sm" data-wtoggle="{{ w.widget_type }}">{% if w.is_visible %}مخفی کن{% else %}نمایش بده{% endif %}</button>
+  </label>
+  {% endfor %}
+</div>
+{% endblock %}

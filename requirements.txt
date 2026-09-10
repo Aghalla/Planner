@@ -1,0 +1,6 @@
+asgiref==3.12.1
+Django==6.1.1
+jalali_core==1.0.0
+jdatetime==6.1.0
+sqlparse==0.6.0
+tzdata==2026.3

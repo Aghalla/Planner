@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}کارها - پلنر{% endblock %}
+{% block content %}
+<div class="card seg-card">
+  <div class="seg">
+    <a href="?status=today" class="{% if status_filter == 'today' %}sel{% endif %}">امروز</a>
+    <a href="?status=pending" class="{% if status_filter == 'pending' %}sel{% endif %}">باز</a>
+    <a href="?status=overdue" class="{% if status_filter == 'overdue' %}sel{% endif %}">عقب‌افتاده</a>
+    <a href="?status=completed" class="{% if status_filter == 'completed' %}sel{% endif %}">انجام‌شده</a>
+    <a href="?status=all" class="{% if status_filter == 'all' %}sel{% endif %}">همه</a>
+  </div>
+</div>
+
+<button class="btn btn-primary" data-new-task style="margin-bottom:14px">+ کار جدید</button>
+
+<div id="taskGroups">
+{% for g in grouped %}
+  <div class="group-label {% if g.is_overdue %}late{% endif %}">{% if g.is_overdue %}⚠ {% endif %}{{ g.label }}</div>
+  {% for t in g.items %}
+  <div class="task-item lb {% if t.completed %}done{% endif %} {% if g.is_overdue and not t.completed %}overdue{% endif %}">
+    <button class="task-check" data-toggle="{{ t.id }}" title="انجام شد">✓</button>
+    <div class="task-title">{{ t.title }}</div>
+    <div class="task-meta">
+      {% if t.due_time %}<span class="task-time">🕐 {{ t.due_time|time:"H:i" }}</span>{% endif %}
+      {% if g.is_overdue and not t.completed %}<span class="pill high">عقب‌افتاده</span>{% endif %}
+      <span class="pill {% if t.priority == 1 %}high{% elif t.priority == 2 %}med{% else %}low{% endif %}">{% if t.priority == 1 %}بالا{% elif t.priority == 2 %}متوسط{% else %}کم{% endif %}</span>
+      {% if t.goal %}<span class="pill low">🎯 {{ t.goal.title }}</span>{% endif %}
+    </div>
+    <div class="task-actions">
+      <button class="icon-btn" data-edit-task="{{ t.id }}" title="ویرایش">✏️</button>
+      <button class="icon-btn del" data-del="{{ t.id }}" title="حذف">🗑</button>
+    </div>
+  </div>
+  {% endfor %}
+{% empty %}
+  <div class="empty-state"><div class="empty-icon">🌤️</div><h3>{% if status_filter == 'overdue' %}هیچ کاری عقب نیفتاده!{% else %}کاری اینجا نیست{% endif %}</h3><p>دکمه «+ کار جدید» را بزن و کار جدید بساز.</p></div>
+{% endfor %}
+</div>
+
+<script id="pageData" type="application/json">{{ page_data|safe }}</script>
+{% endblock %}
+{% block extra_js %}
+<script>try{window.PAGE_DATA=JSON.parse(document.getElementById('pageData').textContent);}catch(e){window.PAGE_DATA={};}</script>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block title %}تنظیمات - Planner{% endblock %}
+{% block content %}
+<h2>تنظیمات</h2>
+<form method="post" class="settings-form">{% csrf_token %}
+<div class="widget"><h3>پروفایل</h3>
+<label>نام نمایشی<input name="display_name" class="form-input" value="{{ settings.display_name }}"></label>
+<label><input type="checkbox" name="greeting_enabled" {% if settings.greeting_enabled %}checked{% endif %}> نمایش خوش‌آمد</label>
+<label><input type="checkbox" name="daily_content_enabled" {% if settings.daily_content_enabled %}checked{% endif %}> محتوای روزانه</label>
+</div>
+<div class="widget"><h3>اعلان‌ها</h3>
+<label><input type="checkbox" name="notifications_enabled" {% if settings.notifications_enabled %}checked{% endif %}> همه اعلان‌ها</label>
+<label><input type="checkbox" name="task_reminder" {% if settings.task_reminder %}checked{% endif %}> یادآوری کار</label>
+<label><input type="checkbox" name="habit_reminder" {% if settings.habit_reminder %}checked{% endif %}> یادآوری عادت</label>
+<label><input type="checkbox" name="goal_reminder" {% if settings.goal_reminder %}checked{% endif %}> یادآوری هدف</label>
+<label><input type="checkbox" name="event_reminder" {% if settings.event_reminder %}checked{% endif %}> یادآوری رویداد</label>
+<label><input type="checkbox" name="pomodoro_reminder" {% if settings.pomodoro_reminder %}checked{% endif %}> یادآوری پومودورو</label>
+</div>
+<div class="widget"><h3>پومودورو</h3>
+<label>تمرکز<input name="focus_duration" type="number" class="form-input" value="{{ settings.focus_duration }}"></label>
+<label>استراحت کوتاه<input name="short_break_duration" type="number" class="form-input" value="{{ settings.short_break_duration }}"></label>
+<label>استراحت بلند<input name="long_break_duration" type="number" class="form-input" value="{{ settings.long_break_duration }}"></label>
+<label>پومودورو تا استراحت بلند<input name="pomodoros_until_long_break" type="number" class="form-input" value="{{ settings.pomodoros_until_long_break }}"></label>
+</div>
+<button class="btn btn-primary">ذخیره</button>
+</form>
+{% endblock %}

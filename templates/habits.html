@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}عادت‌ها - پلنر{% endblock %}
+{% block content %}
+<button class="btn btn-primary" data-new-habit style="margin-bottom:16px">+ عادت جدید</button>
+
+<div class="card">
+{% for h in habits %}
+  <div class="habit-row">
+    <div class="habit-icon" style="background:{{ h.color }}22">{{ h.icon }}</div>
+    <div class="habit-info">
+      <div class="habit-name">{{ h.name }}</div>
+      <div class="habit-sub"><span class="streak">🔥 {{ h.streak }} روز پشت سر هم</span> • این هفته: {{ h.week_count }}/{{ h.target }} • کل: {{ h.total_count }} بار</div>
+    </div>
+    <div class="heatmap">
+      {% for col in weeks %}
+      <div class="hm-col">
+        {% for iso in col %}
+        <div class="hm-cell {% if iso in h.done %}on{% endif %}" {% if iso in h.done %}style="background:{{ h.color }}"{% endif %} title="{{ iso }}"></div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+    <div class="habit-actions">
+      <button class="habit-done-btn {% if h.completed_today %}done{% endif %}" data-htoggle="{{ h.id }}" title="انجامش دادم!">✓</button>
+      <button class="icon-btn" data-edit-habit="{{ h.id }}" title="ویرایش">✏️</button>
+      <button class="icon-btn del" data-hdel="{{ h.id }}" title="حذف">🗑</button>
+    </div>
+  </div>
+{% empty %}
+  <div class="empty-state"><div class="empty-icon">🌱</div><h3>هنوز عادتی نساختی</h3><p>عادت‌های خوب، آینده تو را می‌سازند. یکی اضافه کن!</p></div>
+{% endfor %}
+</div>
+
+<script id="pageData" type="application/json">{{ page_data|safe }}</script>
+{% endblock %}
+{% block extra_js %}
+<script>try{window.PAGE_DATA=JSON.parse(document.getElementById('pageData').textContent);}catch(e){window.PAGE_DATA={};}</script>
+{% endblock %}

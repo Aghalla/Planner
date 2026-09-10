@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}پومودورو - Planner{% endblock %}
+{% block content %}
+<div class="pomodoro-wrap">
+<h2>پومودورو</h2>
+<div class="timer-card">
+<div class="timer-ring">
+<svg width="230" height="230" viewBox="0 0 230 230">
+<circle class="ring-bg" cx="115" cy="115" r="100" fill="none" stroke-width="12"/>
+<circle class="ring-fg" id="ringFg" cx="115" cy="115" r="100" fill="none" stroke-width="12" stroke-dasharray="628" stroke-dashoffset="0"/>
+</svg>
+<div class="timer-center">
+<div class="timer-mode" id="timerMode">تمرکز</div>
+<div class="timer-display" id="timerDisplay">25:00</div>
+<div class="timer-count muted">پومودورو <span id="pomoCount">0</span></div>
+</div>
+</div>
+<div class="timer-task" id="timerTask"></div>
+<label>کار (قبل از شروع انتخاب کن تا تمرکزت بهش وصل بشه): <select id="pomoTask" class="form-input"><option value="">— بدون کار —</option>{% for t in tasks %}<option value="{{ t.id }}">{{ t.title }}</option>{% endfor %}</select></label>
+<div class="row center">
+<button class="btn btn-primary" id="pomoStart">شروع</button>
+<button class="btn btn-ghost" id="pomoReset">ریست</button>
+<button class="btn btn-ghost" id="pomoSkip">رد مرحله</button>
+<button class="btn btn-ghost" id="pomoSound">🔔 صدا روشن</button>
+</div>
+</div>
+<div class="widget"><h3>امروز: {{ total_focus }} دقیقه · {{ pomodoro_count }} پومودورو</h3>
+<form id="pomoSettings" class="inline-form">{% csrf_token %}
+<label>تمرکز <input name="focus_duration" type="number" value="{{ settings.focus_duration }}" class="form-input sm"></label>
+<label>استراحت کوتاه <input name="short_break_duration" type="number" value="{{ settings.short_break_duration }}" class="form-input sm"></label>
+<label>استراحت بلند <input name="long_break_duration" type="number" value="{{ settings.long_break_duration }}" class="form-input sm"></label>
+<label>هر چند پومودورو بلند؟ <input name="pomodoros_until_long_break" type="number" value="{{ settings.pomodoros_until_long_break }}" class="form-input sm"></label>
+<button class="btn btn-primary btn-sm">ذخیره</button></form>
+</div>
+</div>
+<script id="pomoData" type="application/json">{"focus":{{ settings.focus_duration }},"short":{{ settings.short_break_duration }},"long":{{ settings.long_break_duration }},"untilLong":{{ settings.pomodoros_until_long_break }}}</script>
+{% endblock %}
+{% block extra_js %}<script>window.POMODORO=true;</script>{% endblock %}

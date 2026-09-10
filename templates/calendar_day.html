@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}جزئیات روز - Planner{% endblock %}
+{% block content %}
+<h2>{{ target_date }}</h2>
+<div class="widget-grid">
+<section class="widget"><h3>کارها ({{ completed_tasks }}/{{ total_tasks }})</h3><ul>{% for t in tasks %}<li>{% if t.completed %}✓{% else %}☐{% endif %} {{ t.title }}</li>{% empty %}<li class="empty">کاری نیست</li>{% endfor %}</ul></section>
+<section class="widget"><h3>عادت‌ها ({{ completed_habits }}/{{ habits|length }})</h3></section>
+<section class="widget"><h3>تمرکز</h3><p>{{ total_focus }} دقیقه · {{ pomodoro_count }} پومودورو</p><p>{{ active_goals }} هدف فعال</p></section>
+<section class="widget"><h3>رویدادها</h3><ul>{% for e in events %}<li>{{ e.title }}</li>{% empty %}<li class="empty">رویدادی نیست</li>{% endfor %}</ul></section>
+</div>
+<a href="{% url 'calendar' %}" class="btn btn-ghost">بازگشت</a>
+{% endblock %}
