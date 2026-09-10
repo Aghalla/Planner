@@ -21,6 +21,12 @@
 
 ## 🚀 اجرای سریع (ویندوز)
 
+**قدم ۰ — کلون کردن ریپو:**
+```bash
+git clone https://github.com/Aghalla/Planner.git
+cd Planner
+```
+
 **قدم ۱ — نصب خودکار** (فقط بار اول بعد از کلون):
 ```
 دابل‌کلیک روی Setup.bat
